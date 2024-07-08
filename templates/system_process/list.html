@@ -1,0 +1,70 @@
+{% extends 'layout_panel.html' %}
+
+{% block pagecontent %}
+<div class="row">
+<div class="col-12 col-sm-12">
+<div class="callout callout-danger">
+  <p>请使用 Ctrl+F 搜索</p>
+</div>
+
+{% include 'include_messages.html' %}
+
+    <div class="card card-gray card-tabs">
+    <div class="card-header p-0 pt-1">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link{% if list_type == 'all' %} active{% endif %}" href="{% url 'module_system:system_process:list' 'all' %}">
+                所有进程
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if list_type == 'memo' %} active{% endif %}" href="{% url 'module_system:system_process:list' 'memo' %}">
+                内存占用 TOP100
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if list_type == 'log' %} active{% endif %}" href="{% url 'module_system:system_process:list' 'log' %}">
+                使用日志文件的进程
+            </a>
+          </li>
+        </ul>
+    </div>
+    <div class="card-body">
+<table class="table table-bordered table-hover table-sm">
+    <thead class="thead-light">
+    <tr>
+      <th>pid</th>
+      <th>name</th>
+      <th>用户</th>
+       {% if list_type == 'memo' %}
+           <th>内存占用</th>
+           <th>内存占比</th>
+           <th>CPU占比</th>{% endif %}
+      <th>状态</th>
+      <th>命令</th>
+    {% if list_type == 'log' %}<th>日志文件</th>{% endif %}
+    </tr>
+  </thead>
+    <tbody>
+{% for proc in process %}
+    <tr>
+    <td><a href="{% url 'module_system:system_process:detail' list_type proc.pid %}">{{ proc.pid }}</a></td>
+        <td>{{ proc.name }}</td>
+        <td>{{ proc.username }}</td>
+        {% if list_type == 'memo' %}
+            <td>{{ proc.memory_info.rss|filesizeformat }}</td>
+            <td>{{ proc.memory_percent|floatformat:"-4" }}%</td>
+            <td>{{ proc.cpu_percent }}%</td>
+        {% endif %}
+        <td>{{ proc.status }}</td>
+        <td>{{ proc.info.cmdline|join:" " }}</td>
+        {% if list_type == 'log' %}<td>{{ proc.logfiles }}</td>{% endif %}
+{% endfor %}
+    </tr>
+    </tbody>
+</table>
+      </div>
+    </div>
+</div>
+</div>
+{% endblock %}
