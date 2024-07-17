@@ -26,7 +26,10 @@ class ProcessListView(ProcessAdminMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = '进程管理'
-        context['list_type'] = self.kwargs.get('list_type')
+        if 'list_type' in self.kwargs:
+            context['list_type'] = self.kwargs.get('list_type')
+        else:
+            context['list_type'] = 'all'
 
         if context['list_type'] == 'all':
             context['process'] = psutil.process_iter(
